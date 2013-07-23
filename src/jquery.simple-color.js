@@ -139,7 +139,7 @@
     
     options.totalHeight = Math.ceil(options.colors.length / options.columns) * (options.cellHeight + (2 * options.cellMargin));
 	if (options.allowTextEntry) {
-	  options.totalHeight += 31;
+	  options.totalHeight += 45;
 	}
 
     // Store these options so they'll be available to the other functions
@@ -273,15 +273,18 @@
 		  if (options.allowTextEntry) {
 			var textInput = $("<input type='text' class='simpleColorTextEntry' maxlength='6' />");
 			textInput.css({
-              'width':   '100px',
-              'height':  '20px',
-			  'float':   'left',
-			  'display': 'block'
+              'width'      : '100px',
+              'height'     : '20px',
+			  'float'      : 'left',
+			  'display'    : 'block',
+			  'margin-top' : '10px'
             });
 			var span = $("<span class='simpleColorHash'>#</span>");
 			span.css({
-			  'float':    'left',
-			  'display' : 'inline-block'
+			  'float'        : 'left',
+			  'display'      : 'inline-block',
+			  'margin-right' : '5px',
+			  'margin-top'   : '14px'
             });
 			chooser.append(span);
 			chooser.append(textInput);
