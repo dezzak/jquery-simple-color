@@ -118,6 +118,7 @@
       displayColorCode: this.attr('displayColorCode') || false,
       colorCodeAlign:   this.attr('colorCodeAlign') || 'center',
       colorCodeColor:   this.attr('colorCodeColor') || '#FFF',
+	  allowTextEntry:   this.attr('allowTextEntry') || false,
       onSelect:         null,
       onCellEnter:      null,
       onClose:          null,
@@ -137,6 +138,9 @@
     }
     
     options.totalHeight = Math.ceil(options.colors.length / options.columns) * (options.cellHeight + (2 * options.cellMargin));
+	if (options.allowTextEntry) {
+	  options.totalHeight += 31;
+	}
 
     // Store these options so they'll be available to the other functions
     // TODO - must be a better way to do this, not sure what the 'official'
@@ -187,13 +191,6 @@
 
           // If the user has not selected a new color, then revert the display.
           // Makes sure the selected cell is within the current color selector.
-          var target = $(e.target);
-          if (target.is('.simpleColorCell') === false || $.contains( $(event.target).closest('.simpleColorContainer')[0], target[0]) === false) {
-            display_box.css('backgroundColor', default_color);
-            if (options.displayColorCode) {
-              display_box.text(default_color);
-            }
-          }
           // Execute onClose callback whenever the color chooser is closed.
           if (options.onClose) {
             options.onClose();
@@ -272,6 +269,55 @@
 
             });
           }
+		  // If we want to allow a manual text entry, display a text box
+		  if (options.allowTextEntry) {
+			var textInput = $("<input type='text' class='simpleColorTextEntry' maxlength='6' />");
+			textInput.css({
+              'width':   '100px',
+              'height':  '20px',
+			  'float':   'left',
+			  'display': 'block'
+            });
+			var span = $("<span class='simpleColorHash'>#</span>");
+			span.css({
+			  'float':    'left',
+			  'display' : 'inline-block'
+            });
+			chooser.append(span);
+			chooser.append(textInput);
+			textInput.bind("click", function(e) {
+			  e.stopPropagation();
+			});
+			$(event.data.input).bind('change', function() {
+			  textInput.val($(this).val().replace('#', ''));
+			});
+			textInput.bind('change', {
+              input: event.data.input, 
+              chooser: chooser, 
+              display_box: display_box
+            }, 
+            function(event) {
+			  textInput.val(textInput.val().replace('#', ''));
+			  if (/^[a-f0-9]{6}$/i.exec(textInput.val()) === null) {
+				return;
+			  }
+              event.data.input.value = '#' + textInput.val();
+              $(event.data.input).change();
+              event.data.display_box.css('backgroundColor', '#' + textInput.val());
+              event.data.chooser.hide();
+              event.data.display_box.show();
+
+              // If 'displayColorCode' is turned on, display the currently selected color code as text inside the button.
+              if (options.displayColorCode) {
+                event.data.display_box.text('#' + textInput.val());
+              }
+              // If an onSelect callback function is defined then excecute it.
+              if (options.onSelect) {
+                options.onSelect(textInput.val());
+              }
+
+            });
+		  }
         }
       };
       
